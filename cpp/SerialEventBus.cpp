@@ -6,7 +6,10 @@
  */
 
 #include "SerialEventBus.h"
+#include "RPMResponseDecoder.h"
+#include "StringToHexTransformer.h"
 #include <iostream>
+#include <fstream>
 
 SerialEventBus::SerialEventBus() {
 }
@@ -15,9 +18,15 @@ SerialEventBus::~SerialEventBus() {
 }
 
 void SerialEventBus::handle(StandardPIDResponse *standardPidResponse) {
-	std::cout << "Command:" << std::endl;
-	std::cout << standardPidResponse->getCommand();
-	std::cout << "Response: " << std::endl;
-	std::cout << standardPidResponse->getResponse();
+	StringToHexTransformer* stringToHexTransformer = new StringToHexTransformer();
+	RPMResponseDecoder decoder(stringToHexTransformer);
+	std::ofstream os;
+	os.open("monitor.txt", std::ios_base::app);
+	os << "Command:" << std::endl;
+	os << standardPidResponse->getCommand();
+	os << "Response: " << std::endl;
+	os << decoder.decode(standardPidResponse->getResponse()) << std::endl;
+	os.close();
+	delete stringToHexTransformer;
 }
 

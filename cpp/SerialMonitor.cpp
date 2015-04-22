@@ -7,7 +7,6 @@
 
 #include "SerialMonitor.h"
 #include "StandardPIDResponse.h"
-#include <iostream>
 
 SerialMonitor::SerialMonitor(SerialReader *serialReader, SerialEventBus *serialEventBus): stopped(false) {
 	this->serialReader = serialReader;
@@ -37,13 +36,8 @@ void SerialMonitor::monitorLoop() {
 	StandardPIDResponse *standardPidResponse = NULL;
 	while (!stopped) {
 		standardPidResponse = new StandardPIDResponse();
-		std::string s = serialReader->readLine();
-		std::cout << s;
-
-		standardPidResponse->setCommand(s);
-		s = serialReader->readLine();
-		std::cout << s;
-		standardPidResponse->setResponse(s);
+		standardPidResponse->setCommand(serialReader->readLine());
+		standardPidResponse->setResponse(serialReader->readLine());
 
 		serialEventBus->handle(standardPidResponse);
 
